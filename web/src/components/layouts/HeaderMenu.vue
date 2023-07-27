@@ -23,6 +23,7 @@
         </el-sub-menu>
         <el-menu-item index="3" disabled>Info</el-menu-item> -->
         
+        <el-menu-item @click="queryTotalSize">{{ totalSize }}</el-menu-item>
 
         <el-menu-item index="4" @click="handleLogout()" v-if="showLogout">注销</el-menu-item>
     </el-menu>
@@ -30,6 +31,7 @@
 </template>
 
 <script>
+import axios from '@/utils/axios';
 import { defineComponent, reactive, inject } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -64,6 +66,8 @@ export default {
     data(){
         return {
             showLogout: false,
+            // 占用空间大小
+            totalSize: '查询空间占用',
         }
     },
     mounted(){
@@ -79,6 +83,20 @@ export default {
             this.$http.defaults.headers.common['Authorization'] = '';
 
             location.reload();
+        },
+
+        queryTotalSize(){
+            axios({
+                url: '/file/queryTotalSize',
+                method: 'get',
+            }).then((res)=>{
+                console.log(res.data);
+                if(res.data.code==200){
+                    this.totalSize = res.data.data+'MB';
+                }else{
+                    this.totalSize = '查询失败';
+                }
+            })
         }
     }
 };
