@@ -76,6 +76,7 @@ export default {
                     this.$message.success('登录成功');
                     localStorage.setItem('token', res.data.data.token);
                     localStorage.setItem('userId', res.data.data.userId);
+                    localStorage.setItem('username', this.loginForm.username);
                     this.$router.push('/');
                 }else{
                     this.$message.error('登录失败');

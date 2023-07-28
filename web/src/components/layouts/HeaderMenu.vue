@@ -25,9 +25,12 @@
         
         <el-menu-item @click="queryTotalSize">{{ totalSize }}</el-menu-item>
 
-        <el-menu-item index="4" @click="handleLogout()" v-if="showLogout">注销</el-menu-item>
+        <div class="keep-right">
+            <el-menu-item class="highlighted" style="color: orange; font-weight: bold;">用户：{{ username }}</el-menu-item>
+            <el-menu-item index="4" @click="handleLogout()" v-if="showLogout">注销</el-menu-item>
+        </div>
     </el-menu>
-    <div class="h-6" />
+    <!-- <div class="h-6" /> -->
 </template>
 
 <script>
@@ -68,11 +71,13 @@ export default {
             showLogout: false,
             // 占用空间大小
             totalSize: '查询空间占用',
+            username: '',
         }
     },
     mounted(){
         if(localStorage.getItem('userId')){
             this.showLogout = true;
+            this.username = localStorage.getItem('username');
         }
     },
     methods: {
@@ -97,10 +102,20 @@ export default {
                     this.totalSize = '查询失败';
                 }
             })
-        }
-    }
+        },
+    } // methods end
 };
 </script>
+
+<style>
+.keep-right {
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 2%;
+}
+
+</style>
 
 <!-- <script>
 import { defineComponent, ref ,reactive,toRefs} from 'vue'
