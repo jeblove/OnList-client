@@ -86,8 +86,9 @@ export default {
             localStorage.removeItem('userId');
 
             this.$http.defaults.headers.common['Authorization'] = '';
-
-            location.reload();
+            
+            this.$router.push('/');
+            // location.reload();
         },
 
         queryTotalSize(){

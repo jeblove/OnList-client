@@ -37,11 +37,17 @@ export default [
         path: "/login",
         name: "Login",
         component: Login,
+        meta: {
+            requiresAuth: false
+        }
     },
     {
         path: "/register",
         name: "Register",
         component: Register,
+        meta: {
+            requiresAuth: false
+        }
     }
 
 
