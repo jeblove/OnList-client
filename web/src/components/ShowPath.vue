@@ -81,7 +81,7 @@
         </el-dialog>
 
         <!-- 预览dialog -->
-        <el-dialog v-model="previewVisible" :close-on-click-modal="false" :show-close="true" @close="previewClose">
+        <el-dialog v-model="previewVisible" :close-on-click-modal="true" :show-close="true" @close="previewClose">
             <template v-if="previewFileType=='image'">
                 <img :src="previewURL" style="max-width: 100%; max-height: 100%;" />
             </template>
@@ -113,7 +113,8 @@
                     <!-- 列表按钮 -->
 
                     <!-- 预览 -->
-                    <el-button class="fileButton" type="info" slot="reference" circle @click="preview(key.suffix,key.id)" v-if="key.type==0">
+                    <el-button class="fileButton" type="info" slot="reference" circle @click="preview(key.suffix,key.id)" 
+                    v-if="key.type==0 && Object.values(suffixTypeMap).flat().includes(key.suffix)">
                         <font-awesome-icon icon="magnifying-glass" />
                     </el-button>
 
@@ -220,6 +221,12 @@ export default {
             previewContent: '',
             // 控制开关视频显示
             showVideo: false,
+            // 可预览后缀
+            suffixTypeMap: {
+                    image: ['jpg', 'jpeg', 'png', 'gif'],
+                    video: ['mp4', 'avi', 'wmv', 'mov'],
+                    text: ['txt', 'doc', 'docx', 'pdf']
+                }
         };
     },
 
@@ -616,15 +623,9 @@ export default {
             }).then(res => {
                 this.previewURL = URL.createObjectURL(new Blob([res.data]));
 
-                const suffixTypeMap = {
-                    image: ['jpg', 'jpeg', 'png', 'gif'],
-                    video: ['mp4', 'avi', 'wmv', 'mov'],
-                    text: ['txt', 'doc', 'docx', 'pdf']
-                }
-
                 let fileType = 'other';
-                for (const type in suffixTypeMap) {
-                    if (suffixTypeMap[type].includes(suffix)) {
+                for (const type in this.suffixTypeMap) {
+                    if (this.suffixTypeMap[type].includes(suffix)) {
                     fileType = type;
                     break;
                     }
