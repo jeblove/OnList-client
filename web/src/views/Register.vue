@@ -79,6 +79,18 @@ export default {
         register(){
             delete this.registerForm.password2;
             console.log(this.registerForm)
+            const form = this.$refs.registerForm;
+            const isValid = form.validate();
+            const errors = isValid ? null : Object.values(isValid).filter(v => v); // 如果表单未通过验证，则获取错误信息
+            const hasErrors = errors && errors.length > 0; // 判断是否存在错误信息
+            if (!hasErrors) {
+                // 正常
+            } else {
+                // 错误
+                this.$message.error('注册失败');
+                return;
+            }
+
             axios({
                 url: '/user/register',
                 method: 'post',
