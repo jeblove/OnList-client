@@ -9,6 +9,7 @@
                 <el-breadcrumb separator="/" class="breadcrumb">
                     <el-breadcrumb-item v-for="(path, index) in breadcrumbPaths" :key="index" class="breadcrumb-item">
                         <a href="#" @click="handleClickBreadcrumb(index)">
+                            <font-awesome-icon v-if="index===0" icon="fa-solid fa-house" />
                             {{ path }}
                         </a>
                     </el-breadcrumb-item>
