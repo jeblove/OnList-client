@@ -95,14 +95,24 @@
 
         </el-dialog>
         
-
+        <!-- 右键菜单框 -->
+        <AgelContextMenu 
+            v-model="contextMenu.show" 
+            :x="contextMenu.x" 
+            :y="contextMenu.y" 
+            :menus="computedMenuData"
+            @select="onSelect($event)" 
+        />
+        <!-- :menus="contextMenu.data" -->
         <!-- 文件列表 -->
-        <el-main class="main">
+        <el-main class="main" >
             <div v-for="(key, index) in resultData">
                 <div class="fileDiv">
                     <a href="#" class="fileA" 
-                        @click="clickFile(key.type, key.label, key.id)"
+                        @click="clickFile(key)"
+                        @contextmenu.prevent="onContextmenu($event, key)"
                     >
+                    <!-- @click="clickFile(key.type, key.label, key.id)" -->
                         <span class="fileMarginLeft"></span>
                         <font-awesome-icon v-if="key.type==0" icon="fa-solid fa-file" />
                         <font-awesome-icon v-if="key.type==1" icon="fa-solid fa-folder-open" />
@@ -113,38 +123,7 @@
 
                     <!-- 列表按钮 -->
 
-                    <!-- 预览 -->
-                    <el-button class="fileButton" type="info" slot="reference" circle @click="preview(key.suffix,key.id)" 
-                    v-if="key.type==0 && Object.values(suffixTypeMap).flat().includes(key.suffix)">
-                        <font-awesome-icon icon="magnifying-glass" />
-                    </el-button>
 
-                    <!-- 复制 -->
-                    <el-button class="fileButton" type="success" slot="reference" circle @click="preHandleCpAMv(key.label,'cp',key.type)">
-                        <font-awesome-icon icon="copy" />
-                    </el-button>
-
-                    <!-- 剪切 -->
-                    <el-button class="fileButton" type="warning" slot="reference" circle @click="preHandleCpAMv(key.label,'mv',key.type)">
-                        <font-awesome-icon icon="scissors" />
-                    </el-button>
-
-                    <!-- 重命名 -->
-                    <el-button class="fileButton" type="info" slot="reference" circle @click="openRenameFun(key.label,key.type)">
-                        <font-awesome-icon icon="file-signature" />
-                    </el-button>
-
-                    <!-- 删除 -->
-                    <el-popconfirm 
-                        title="确定要删除该文件吗？"
-                        @confirm="handleButtonDelete(key.label,key.type)"
-                    >
-                        <template #reference>
-                            <el-button class="fileButton" type="danger" slot="reference" circle >
-                                <font-awesome-icon icon="trash" />
-                            </el-button>
-                        </template>
-                    </el-popconfirm>
 
                 </div> <!-- fileDiv -->
             </div>
@@ -164,6 +143,7 @@
 import axios from '@/utils/axios';
 import { ElContainer, ElHeader, ElMain, ElTree, ElUpload, ElNotification } from "element-plus";
 import { reactive } from "vue";
+import { ElMessage } from 'element-plus'
 
 export default {
     name: "showPath",
@@ -174,6 +154,7 @@ export default {
         ElTree,
         ElUpload,
         ElNotification,
+        ElMessage,
         
     },
     data() {
@@ -227,7 +208,43 @@ export default {
                     image: ['jpg', 'jpeg', 'png', 'gif'],
                     video: ['mp4', 'avi', 'wmv', 'mov'],
                     text: ['txt', 'doc', 'docx', 'pdf']
-                }
+            },
+            fullScreen: false,
+            selectedKey: null,
+            contextMenu: {
+                show: false,
+                x: 0,
+                y: 0,
+                data: [
+                    // {
+                    //     title: '预览',
+                    //     command: 'preview',
+                    //     icon: 'magnifying-glass',
+                    // },
+                    {
+                        title: '复制',
+                        command: 'copy',
+                        icon: 'CopyDocument',
+                    },
+                    {
+                        title: '剪切',
+                        command: 'scissors',
+                        icon: 'Scissor',
+                    },
+                    {
+                        title: '重命名',
+                        command: 'rename',
+                        icon: 'EditPen',
+                    },
+                    {
+                        title: '删除',
+                        command: 'trash',
+                        icon: 'Delete',
+                    },
+                ],
+                
+            },
+            
         };
     },
 
@@ -288,19 +305,21 @@ export default {
         },
 
         // 点击
-        clickFile(type, label, id){
+        clickFile(key){
             // console.log(key.id)
+            let type = key.type
             if(type==0){
                 // 下载文件
-                this.downloadNodeClick(type, label, id);
+                // this.downloadNodeClick(type, label, id);
+                this.preview(key.suffix, key.id)
                 
             }else if(type==1){
                 // 进入该目录
 
                 // this.rout = this.rout + label + '/'
 
-                this.breadcrumbPaths.push(label);
-                this.rout += (label + '/');
+                this.breadcrumbPaths.push(key.label);
+                this.rout += (key.label + '/');
 
                 this.getData()
             }
@@ -662,8 +681,73 @@ export default {
             this.previewVisible=false;
 
         },
+        // 右键菜单项目时
+        onContextmenu(e, key) {
+            this.contextMenu.show = true
+            this.contextMenu.x = e.clientX
+            this.contextMenu.y = e.clientY
+            // 传递key到对应菜单项目中
+            this.selectedKey = key;
+            e.preventDefault()
+        },
+        // 右键菜单选中项目操作
+        onSelect(item) {
+            // ElMessage.success('选中了' + item.title)
+            let key = this.selectedKey;
+            if(item.command == 'download'){
+                // console.log('预览操作')
+                // this.preview(key.suffix,key.id)
+                this.downloadNodeClick(key.type, key.label, key.id);
+
+            }else if(item.command == 'copy'){
+                this.preHandleCpAMv(key.label,'cp',key.type)
+
+            }else if(item.command == 'scissors'){
+                this.preHandleCpAMv(key.label,'mv',key.type)
+
+            }else if(item.command == 'rename'){
+                this.openRenameFun(key.label,key.type)
+
+            }else if (item.command === 'trash') {
+                this.$confirm('确定要删除该文件吗？', '警告', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.handleButtonDelete(key.label, key.type);
+                }).catch(() => {
+                    // 用户取消删除操作
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除操作'
+                    });
+                });
+            }
+        }
 
     }, // methods_end
+
+    computed: {
+        // 计算属性
+        // 根据key.type动态生成菜单项
+        computedMenuData() {
+            // 如果没有选中的key，则直接返回默认的菜单项
+            if (!this.selectedKey) return this.contextMenu.data;
+            
+            // 根据key.type决定是否添加预览菜单项
+            const menuData = [...this.contextMenu.data]; 
+            // 复制默认菜单项
+            if (this.selectedKey.type === 0) { 
+                // 文件类型
+                menuData.unshift({
+                    title: '下载',
+                    command: 'download',
+                    icon: 'Download',
+                });
+            }
+            return menuData;
+        },
+    }
 };
 </script>
 

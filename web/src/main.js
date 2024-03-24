@@ -23,6 +23,11 @@ dom.watch()
 import vue3videoPlay from "vue3-video-play"; // 引入组件
 import "vue3-video-play/dist/style.css"; // 引入css
 
+// elementplus-crx
+import ElementPlusCrx from "element-plus-crx";
+import 'element-plus/dist/index.css'
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+
 // axios 设置全局请求拦截器
 axios.interceptors.request.use(
     (config) => {
@@ -83,6 +88,13 @@ app.provide('$http', axios)
 app.use(router)
 app.use(store).use(ElementPlus)
 app.use(vue3videoPlay)
+
+app.use(ElementPlus);
+app.use(ElementPlusCrx);
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component);
+}
+
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.mount('#app')
 
