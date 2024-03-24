@@ -1,4 +1,5 @@
 <template>
+    <div class="centered-menu">
     <el-menu class="el-menu-demo" mode="horizontal" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b"
         @select="handleSelect">
         <!-- :default-active="activeIndex" -->
@@ -31,6 +32,7 @@
         </div>
     </el-menu>
     <!-- <div class="h-6" /> -->
+    </div>
 </template>
 
 <script>
@@ -110,13 +112,26 @@ export default {
 
 <style>
 .keep-right {
-    margin-left: auto;
+    /* margin-left: auto; */
     display: flex;
     justify-content: flex-end;
     margin-right: 2%;
 }
 
+.el-menu-demo {
+    max-width: 80%;
+    width: 100%;
+}
+
+.centered-menu {
+    /* display: inline-block; */
+    /* width: 80%; */
+    display: flex;
+    justify-content: center;
+}
+
 </style>
+
 
 <!-- <script>
 import { defineComponent, ref ,reactive,toRefs} from 'vue'
