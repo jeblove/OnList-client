@@ -4,6 +4,7 @@ import ShowPath from "../components/ShowPath.vue"
 import Login from "../views/Login.vue"
 import Register from "../views/Register.vue"
 import FileList from "../components/FileList.vue"
+import Setting from "../components/Setting.vue"
 
 export default [
     {
@@ -45,10 +46,15 @@ export default [
         path: "/register",
         name: "Register",
         component: Register,
+    },
+    {
+        path: "/setting",
+        name: "Setting",
+        component: Setting,
         meta: {
-            requiresAuth: false
-        }
-    }
+            requiresAuth: true
+        },
+    },
 
 
 ]
