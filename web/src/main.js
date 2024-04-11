@@ -49,9 +49,10 @@ axios.interceptors.request.use(
 router.beforeEach((to,from,next) => {
     // 检查页面是否需要登录
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth); 
-  
+
     if (requiresAuth && !isLoggedIn()) { // 如果需要登录而且未登录，则跳转到登录页面
     //   next('/login');
+        localStorage.clear();
         next({
             path: '/login',
             query: { redirect: to.fullPath } // 将当前页面的路径作为查询参数传递给登录页，用于登录后的重定向
