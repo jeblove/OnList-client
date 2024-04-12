@@ -87,7 +87,7 @@ const store = createStore({
 
 app.provide('$http', axios)
 app.use(router)
-app.use(store).use(ElementPlus)
+app.use(store)
 app.use(vue3videoPlay)
 
 app.use(ElementPlus);
