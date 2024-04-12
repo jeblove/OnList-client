@@ -1,5 +1,10 @@
 <template>
-    表格边框: <el-switch v-model="tableBorder" />
+    
+    <el-row type="flex" justify="start">
+        <el-button type="info" size="small" @click="refreshUserInfo()">刷新</el-button>
+        <el-switch v-model="tableBorder" inactive-text="表格边框" />
+    </el-row>
+
     <el-table :data="tableData" style="width: 100%" :border="tableBorder" :row-class-name="tableRowClassName">
         <el-table-column type="expand">
             <template #default="props">

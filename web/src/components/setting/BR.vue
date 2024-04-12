@@ -26,10 +26,10 @@
         </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" title="恢复数据" width="300">
+    <el-dialog v-model="dialogVisible" title="恢复数据" width="300" align-center>
         <el-form :model="editForm" label-width="auto">
             <el-form-item label="是否删除当前数据再恢复？">
-                <el-switch v-model="editForm.drop" />
+                <el-switch v-model="editForm.drop" inactive-text="否" active-text="是" />
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">

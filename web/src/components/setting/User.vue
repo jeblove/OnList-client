@@ -28,7 +28,7 @@
     </el-table>
 
     <!-- 编辑框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" align-center>
         <el-form :model="editForm" label-width="80px">
             <el-form-item label="用户名" :required="true">
                 <el-input v-model="editForm.username" />
@@ -36,19 +36,15 @@
             <el-form-item label="密码" :required="true">
                 <el-input v-model="editForm.newPassword" type="password" placeholder="********" show-password />
             </el-form-item>
-            <el-form-item label="目录ID" :required="true">
+            <el-form-item label="目录ID">
                 <el-input v-model="editForm.pathId" />
             </el-form-item>
             <el-form-item label="权限">
-                用户
-                <el-switch v-model="editForm.permissions.role" />
-                管理员
+                <el-switch v-model="editForm.permissions.role" inactive-text="用户" active-text="管理员"/>
             </el-form-item>
             <el-form-item label="是否禁用">
-                否
                 <el-switch v-model="editForm.permissions.disabled"
-                    style="--el-switch-off-color: #13ce66; --el-switch-on-color: #ff4949" />
-                是
+                    style="--el-switch-off-color: #13ce66; --el-switch-on-color: #ff4949" inactive-text="否" active-text="是" />
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">

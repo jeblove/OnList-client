@@ -1,6 +1,6 @@
 <template>
-    表格边框: <el-switch v-model="tableBorder" /> 
-    <el-table :data="tableData" stripe style="width: 100%" :border="tableBorder" :row-class-name="tableRowClassName">
+    <el-switch v-model="tableBorder" inactive-text="表格边框" />
+    <el-table :data="tableData" stripe style="width: 100%" :border="tableBorder">
         <el-table-column type="expand">
             <template #default="props">
                 <el-table :data="props.row.linkUserTableData" stripe style="width: 100%" :border="tableBorder">
