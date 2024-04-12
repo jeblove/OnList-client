@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import axios from '@/utils/axios';
+
 import { defineComponent, markRaw } from 'vue';
 import Information from './setting/Information.vue';
 import User from './setting/User.vue';
@@ -60,16 +62,61 @@ export default defineComponent({
                 '6': Share,
                 '7': BR,
             },
+            isAdmin: false,
         };
     },
     methods: {
+        async fetchIsAdminStatus() {
+            axios({
+                url: '/user/isAdmin',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'multipart/form-data;'
+                },
+                data: {
+                    'userId': localStorage.getItem('userId'),
+                },
+            }).then((res) => {
+                if (res.data.code == 200) {
+                    // 个人信息页面
+                    this.activeIndex = '1';
+                    this.currentView = this.componentsMapping[this.activeIndex];
+
+                    this.isAdmin = res.data.data;
+                    this.updateMenuData();
+                } else {
+                    this.isAdmin = false;
+                    this.updateMenuData();
+
+                    this.activeIndex = '1';
+                    this.currentView = this.componentsMapping[this.activeIndex];
+                }
+            }).catch((error) => {
+                console.error('获取用户是否为管理员信息失败:', error);
+                 // 请求失败，默认不显示全部菜单
+                 this.isAdmin = false;
+                 this.updateMenuData();
+
+                 this.activeIndex = '1';
+                this.currentView = this.componentsMapping[this.activeIndex];
+            })
+        },
         handleMenuSelect(index) {
             this.activeIndex = index;
             this.currentView = this.componentsMapping[index];
         },
+        updateMenuData() {
+            if (!this.isAdmin) {
+                 // 普通用户只保留第一个菜单项（个人信息）
+                this.menuData = this.menuData.slice(0, 1);
+            }
+        },
     },
     mounted() {
-        this.currentView = this.componentsMapping[this.activeIndex];
+        // this.currentView = this.componentsMapping[this.activeIndex];
+    },
+    async created() {
+        await this.fetchIsAdminStatus();
     },
 });
 </script>
