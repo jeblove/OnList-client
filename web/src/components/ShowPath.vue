@@ -103,6 +103,41 @@
             :menus="computedMenuData"
             @select="onSelect($event)" 
         />
+
+        <!-- 创建链接分享框 -->
+        <el-dialog v-model="shareDialogVisible" title="文件分享" width="500px" align-center>
+        <el-form :model="shareEditForm" label-width="100px">
+            <el-form-item label="分享文件" :required="true">
+                <el-input v-model="shareEditForm.filename" disabled />
+            </el-form-item>
+            <el-form-item label="有效小时" :required="true">
+                <el-tooltip class="box-item" effect="dark" content="指定小时后无法访问" placement="right-start">
+                    <el-input v-model="shareEditForm.expireDuration" />
+                </el-tooltip>
+            </el-form-item>
+            <el-form-item label="最大访问次数" :required="true">
+                <el-tooltip class="box-item" effect="dark" content="达到上限访问次数后无法访问" placement="right-start">
+                    <el-input v-model="shareEditForm.visitLimit" />
+                </el-tooltip>
+            </el-form-item>
+        </el-form>
+        <el-form-item v-if="shareDownloadLink" class="share-download-link-container" label="分享链接">
+            <el-input
+                readonly
+                clearable
+                autosize
+                placeholder="点击复制链接"
+                type="textarea"
+                v-model="shareDownloadLink"
+                @copy="handleCopyLink"
+            />
+        </el-form-item>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="shareDialogVisible = false">关闭</el-button>
+            <el-button type="primary" @click="createShare()" v-if="!shareDownloadLink">创建分享</el-button>
+        </span>
+    </el-dialog>
+
         <!-- :menus="contextMenu.data" -->
         <!-- 文件列表 -->
         <el-main class="main" >
@@ -244,7 +279,19 @@ export default {
                 ],
                 
             },
-            
+            // 分享框
+            tableData: [],
+            shareDialogVisible: false,
+            shareEditForm: {
+                filename: '',
+                fileLinkId: '',
+                expireDuration: 24,
+                visitLimit: 5
+            },
+            // 分享文件下载链接
+            shareDownloadLink: '',
+            // 赋值到剪贴板
+            clipboardSupported: false,
         };
     },
 
@@ -722,8 +769,59 @@ export default {
                         message: '已取消删除操作'
                     });
                 });
+            }else if (item.command === 'share') {
+                this.shareEditForm = {
+                    filename: '',
+                    fileLinkId: '',
+                    expireDuration: 24,
+                    visitLimit: 5
+                },
+                this.shareDownloadLink = '',
+
+                this.shareDialogVisible = true;
+                this.shareEditForm.fileLinkId = key.id;
+                this.shareEditForm.filename = key.label;
             }
-        }
+        },
+        // 分享文件
+        createShare(){
+            axios({
+                url: '/share/createShareLink',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'multipart/form-data;'
+                },
+                data: {
+                    'username': localStorage.getItem('username'),
+                    'fileLinkId': this.shareEditForm.fileLinkId,
+                    'expireDuration': this.shareEditForm.expireDuration,
+                    'visitLimit': this.shareEditForm.visitLimit
+                },
+            }).then((res) => {
+                if (res.data.code == 200) {
+                    this.$message.success('创建分享成功');
+                    this.shareDownloadLink = axios.defaults.baseURL + res.data.data.downloadUrl;
+
+                    if (this.clipboardSupported) {
+                        navigator.clipboard.writeText(this.shareDownloadLink).then(() => {
+                        this.$message.success('链接已自动复制到剪贴板');
+                        }, () => {
+                        this.$message.error('复制链接到剪贴板失败，请手动复制');
+                        });
+                    } else {
+                        this.$message.info('您的浏览器暂不支持自动复制链接到剪贴板，请手动复制');
+                    }
+                } else {
+                    this.$message.error('创建分享失败');
+                }
+            }).catch((error) => {
+                this.$message.error('创建分享失败');
+            })
+        },
+        handleCopyLink() {
+            this.$message.success('链接已复制到剪贴板');
+        },
+        
 
     }, // methods_end
 
@@ -739,14 +837,28 @@ export default {
             // 复制默认菜单项
             if (this.selectedKey.type === 0) { 
                 // 文件类型
-                menuData.unshift({
-                    title: '下载',
-                    command: 'download',
-                    icon: 'Download',
-                });
+                menuData.unshift(
+                    {
+                        title: '下载',
+                        command: 'download',
+                        icon: 'Download',
+                    },
+                    {
+                        title: '分享',
+                        command: 'share',
+                        icon: 'Share',
+                    }
+                );
             }
             return menuData;
         },
+    },
+    mounted() {
+        if ('clipboard' in navigator) {
+            this.clipboardSupported = true;
+        } else {
+            this.clipboardSupported = false;
+        }
     }
 };
 </script>
