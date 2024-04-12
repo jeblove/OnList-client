@@ -28,7 +28,7 @@
     </el-table>
 
     <!-- 编辑框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
         <el-form :model="editForm" label-width="80px">
             <el-form-item label="用户名" :required="true">
                 <el-input v-model="editForm.username" />
