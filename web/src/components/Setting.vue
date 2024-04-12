@@ -3,7 +3,7 @@
         <!-- 左侧菜单区域 -->
         <el-aside width="100px">
             <el-menu :default-active="activeIndex" class="el-menu-vertical-demo" @select="handleMenuSelect">
-                <el-menu-item v-for="item in menuData" :key="item.index" :index="item.index">
+                <el-menu-item v-for="item in displayedMenuData" :key="item.index" :index="item.index">
                     {{ item.label }}
                 </el-menu-item>
             </el-menu>
@@ -42,7 +42,7 @@ export default defineComponent({
     },
     data() {
         return {
-            menuData: [
+            originalMenuData: [
                 { index: '1', label: '个人信息' },
                 { index: '2', label: '用户' },
                 { index: '3', label: '目录' },
@@ -51,6 +51,7 @@ export default defineComponent({
                 { index: '6', label: '分享' },
                 { index: '7', label: '备份' },
             ],
+            displayedMenuData: [],
             activeIndex: '1',
             currentView: null,
             componentsMapping: {
@@ -78,37 +79,34 @@ export default defineComponent({
                 },
             }).then((res) => {
                 if (res.data.code == 200) {
-                    // 个人信息页面
-                    this.activeIndex = '1';
-                    this.currentView = this.componentsMapping[this.activeIndex];
 
                     this.isAdmin = res.data.data;
-                    this.updateMenuData();
                 } else {
                     this.isAdmin = false;
-                    this.updateMenuData();
-
-                    this.activeIndex = '1';
-                    this.currentView = this.componentsMapping[this.activeIndex];
                 }
-            }).catch((error) => {
-                console.error('获取用户是否为管理员信息失败:', error);
-                 // 请求失败，默认不显示全部菜单
-                 this.isAdmin = false;
-                 this.updateMenuData();
-
-                 this.activeIndex = '1';
+                this.updateMenuData();
+                this.activeIndex = '1';
                 this.currentView = this.componentsMapping[this.activeIndex];
-            })
+            }).catch((error) => {
+                // 请求失败，默认不显示全部菜单
+                this.isAdmin = false;
+                this.updateMenuData();
+                this.activeIndex = '1';
+                this.currentView = this.componentsMapping[this.activeIndex];
+            });
         },
         handleMenuSelect(index) {
             this.activeIndex = index;
             this.currentView = this.componentsMapping[index];
         },
         updateMenuData() {
-            if (!this.isAdmin) {
-                 // 普通用户只保留第一个菜单项（个人信息）
-                this.menuData = this.menuData.slice(0, 1);
+            if (this.isAdmin) {
+                this.displayedMenuData = [...this.originalMenuData];
+            } else {
+                // 如果已经是个人信息则无需再次更新
+                if (this.displayedMenuData.length !== 1 || this.displayedMenuData[0].index !== '1') {
+                    this.displayedMenuData = [{ index: '1', label: '个人信息' }];
+                }
             }
         },
     },
