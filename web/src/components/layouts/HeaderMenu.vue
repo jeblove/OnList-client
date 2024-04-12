@@ -28,6 +28,7 @@
 
         <div class="keep-right">
             <el-menu-item class="highlighted" style="color: orange; font-weight: bold;">用户：{{ username }}</el-menu-item>
+            <el-menu-item index="4" @click="goto('/setting')" v-if="showLogout">管理</el-menu-item>
             <el-menu-item index="4" @click="handleLogout()" v-if="showLogout">注销</el-menu-item>
         </div>
     </el-menu>
@@ -106,6 +107,9 @@ export default {
                 }
             })
         },
+        goto(target){
+            this.$router.push(target);
+        }
     } // methods end
 };
 </script>
