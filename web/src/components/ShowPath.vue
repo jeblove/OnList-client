@@ -469,21 +469,33 @@ export default {
 
             if(type==0){
                 // 文件
-                formData.append('filename', filename);
-                axios({
-                    url: '/file/deleteFile',
-                    method: 'post',
-                    data: formData,
-                }).then((res) => {
-                    // console.log(res.data)
-                    if(res.data.code==200){
-                        this.$message.success('删除文件成功');
-                        this.getData();
-                    }else{
+                this.$confirm('确定要删除该文件吗？', '警告', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    formData.append('filename', filename);
+                    axios({
+                        url: '/file/deleteFile',
+                        method: 'post',
+                        data: formData,
+                    }).then((res) => {
+                        // console.log(res.data)
+                        if(res.data.code==200){
+                            this.$message.success('删除文件成功');
+                            this.getData();
+                        }else{
+                            this.$message.error('删除文件失败');
+                        }
+                    }).catch((res)=>{
                         this.$message.error('删除文件失败');
-                    }
-                }).catch((res)=>{
-                    this.$message.error('删除文件失败');
+                    });
+                }).catch(() => {
+                    // 用户取消删除操作
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除操作'
+                    });
                 });
             }else{
                 // 目录，二级弹窗
@@ -676,9 +688,22 @@ export default {
             })
             this.openRename = false;
         },
+        // 检测是否支持该文件后缀格式
+        isSupportedSuffix(suffix) {
+            for (const type in this.suffixTypeMap) {
+                if (this.suffixTypeMap[type].includes(suffix)) {
+                    return true;
+                }
+            }
+            return false;
+        },
 
         // 预览
         preview(suffix, id){
+            if (!this.isSupportedSuffix(suffix)) {
+                this.$message.error(`不支持"${suffix}"格式的文件预览`);
+                return;
+            }
 
             axios({
                 url: '/file/downloadFileByFileLinkId',
@@ -702,6 +727,7 @@ export default {
                 if(fileType=='image'){
                     // this.previewURL = 
                 }else if(fileType=='video'){
+                    console.log('视频预览')
                     this.previewVideo = reactive({
                         width: "100%",
                         height: "100%",
@@ -756,19 +782,20 @@ export default {
                 this.openRenameFun(key.label,key.type)
 
             }else if (item.command === 'trash') {
-                this.$confirm('确定要删除该文件吗？', '警告', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    this.handleButtonDelete(key.label, key.type);
-                }).catch(() => {
-                    // 用户取消删除操作
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除操作'
-                    });
-                });
+                this.handleButtonDelete(key.label, key.type);
+                // this.$confirm('确定要删除该文件吗？', '警告', {
+                //     confirmButtonText: '确定',
+                //     cancelButtonText: '取消',
+                //     type: 'warning'
+                // }).then(() => {
+                //     this.handleButtonDelete(key.label, key.type);
+                // }).catch(() => {
+                //     // 用户取消删除操作
+                //     this.$message({
+                //         type: 'info',
+                //         message: '已取消删除操作'
+                //     });
+                // });
             }else if (item.command === 'share') {
                 this.shareEditForm = {
                     filename: '',
