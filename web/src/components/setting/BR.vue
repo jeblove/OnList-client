@@ -57,7 +57,7 @@ export default {
             progressStatus: '',
             backupTimeoutId: null,
             // 设置预计备份时间（秒）
-            estimatedBackupTimeSeconds: 10,
+            estimatedBackupTimeSeconds: 20,
             // 设置模拟进度的最大值，防止真实响应晚于预期
             maxSimulatedProgress: 0.9,
             uploadHeaders: {

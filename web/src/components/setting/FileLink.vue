@@ -5,12 +5,12 @@
             <template #default="props">
                 <el-table :data="props.row.linkUserTableData" stripe style="width: 100%" :border="tableBorder">
                     <el-table-column label="用户" prop="user" />
-                    <el-table-column label="总链接数" prop="count" />
+                    <el-table-column label="链接数" prop="count" />
                 </el-table>
             </template>
         </el-table-column>
         <el-table-column prop="fileId" label="文件ID" width="auto" />
-        <el-table-column prop="linkNum" label="链接数" width="auto" />
+        <el-table-column prop="linkNum" label="总链接数" width="auto" />
     </el-table>
 
 </template>
