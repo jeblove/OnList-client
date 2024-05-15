@@ -69,7 +69,7 @@ export default {
             return date.toLocaleString();
         },
         tableRowClassName({ row }) {
-            if (row.expired) {
+            if (row.expired || row.visits >= row.visitLimit) {
                 return 'warning-row';
             } else {
                 return 'success-row';
