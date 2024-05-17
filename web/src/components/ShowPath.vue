@@ -203,7 +203,7 @@ export default {
 
             uploadUrl: '/file/upload',
             // 用户id
-            userId: '646e1eba859e82211d3bc5c2',
+            userId: localStorage.getItem('userId'),
             fileList: [],
             // 当前路径
             pathList: [],
