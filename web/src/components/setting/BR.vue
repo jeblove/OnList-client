@@ -142,7 +142,7 @@ export default {
                 if (this.progressPercentage <= this.maxSimulatedProgress * 100) {
                     this.incrementBackupProgress();
                 }
-            }, 1000);
+            }, 2000);
         },
         // 执行恢复
         restoreBackup(filename, drop) {
